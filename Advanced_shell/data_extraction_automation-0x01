@@ -1,0 +1,15 @@
+#!/bin/bash
+
+# Expected format: $name is of type $type, weighs ${formatted_weight}kg, and is ${formatted_height}m tall.
+
+JSON_FILE="data.json"
+
+name=$(jq -r '.name' "$JSON_FILE" | sed 's/.*/\u&/')
+type=$(jq -r '.types[0].type.name' "$JSON_FILE" | sed 's/.*/\u&/')
+height_dm=$(jq -r '.height' "$JSON_FILE")
+weight_hg=$(jq -r '.weight' "$JSON_FILE")
+
+formatted_height=$(awk "BEGIN { printf \"%.1f\", $height_dm / 10 }")
+formatted_weight=$(awk "BEGIN { printf \"%.0f\", $weight_hg / 10 }")
+
+echo "${name} is of type ${type}, weighs ${formatted_weight}kg, and is ${formatted_height}m tall."
