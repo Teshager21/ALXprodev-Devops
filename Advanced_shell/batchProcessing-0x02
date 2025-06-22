@@ -7,20 +7,33 @@ mkdir -p "$OUTPUT_DIR"
 # List of Pokémon to fetch
 pokemon_list=("bulbasaur" "ivysaur" "venusaur" "charmander" "charmeleon")
 
-# Loop through the list
+# Max retry attempts
+MAX_RETRIES=3
+
+# Loop through the Pokémon list
 for name in "${pokemon_list[@]}"; do
     echo "Fetching data for $name..."
 
-    # Convert name to lowercase to match API format
     name_lower=$(echo "$name" | awk '{ print tolower($0) }')
+    output_file="$OUTPUT_DIR/${name_lower}.json"
+    api_url="https://pokeapi.co/api/v2/pokemon/${name_lower}"
 
-    # API request and error handling
-    if curl -s -f "https://pokeapi.co/api/v2/pokemon/$name_lower" -o "$OUTPUT_DIR/$name_lower.json"; then
-        echo "Saved data to $OUTPUT_DIR/$name_lower.json ✅"
-    else
-        echo "❌ Failed to fetch data for $name" >> errors.txt
+    success=false
+    for attempt in $(seq 1 $MAX_RETRIES); do
+        if curl -s -f "$api_url" -o "$output_file"; then
+            echo "Saved data to $output_file ✅"
+            success=true
+            break
+        else
+            echo "Attempt $attempt for $name failed. Retrying in 2s..."
+            sleep 2
+        fi
+    done
+
+    if [ "$success" = false ]; then
+        echo "❌ Failed to fetch data for $name after $MAX_RETRIES attempts" | tee -a errors.txt
     fi
 
-    # Add a delay to handle potential rate limits
+    # Delay to prevent rate-limiting
     sleep 1
 done
