@@ -1,0 +1,29 @@
+# Ignore API response and error logs
+data.json
+errors.txt
+
+# OS/system files
+.DS_Store
+Thumbs.db
+
+# Editor/IDE temporary files
+*.swp
+*.swo
+*.bak
+*.tmp
+*~
+
+# VSCode settings (if using VSCode)
+.vscode/
+
+# Logs
+*.log
+logs/
+
+# Backup or generated files
+*.orig
+*.save
+
+# Shell history (if accidentally created)
+.bash_history
+.zsh_history
